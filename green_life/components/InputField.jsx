@@ -28,7 +28,7 @@ function InputField({
             value={value}
             onChangeText={onChangeText}
             placeholder={placeholder}
-            secureTextEntry={visible && secureTextEntry}
+            secureTextEntry={visible ? secureTextEntry : false}
             keyboardType={keyboardType}
           />
         </View>

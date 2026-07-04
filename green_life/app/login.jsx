@@ -2,8 +2,10 @@ import Button from "@/components/Button";
 import Header from "@/components/Header";
 import InputField from "@/components/InputField";
 import OutlineButton from "@/components/OutlineButton";
+import { supabase } from "@/utils/supabase";
 import { router } from "expo-router";
 import {
+  Alert,
   Platform,
   Pressable,
   StatusBar,
@@ -14,8 +16,49 @@ import {
 
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import Fontisto from "@expo/vector-icons/Fontisto";
+import { useState } from "react";
 
 function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin() {
+    if (!email || !password) {
+      Alert.alert("Error", "All fields are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // await signInUser(email, password);
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
+
+      if (error) {
+        Alert.alert("Error", error.message);
+        return;
+      }
+
+      if (!data.session) {
+        Alert.alert("Login Error", "No session was created. Please try again.");
+        return;
+      }
+
+      setEmail("");
+      setPassword("");
+
+      router.replace("/home");
+    } catch (error) {
+      Alert.alert("Error", error);
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <View style={styles.container}>
       <Header caption="Sign In" />
@@ -31,25 +74,23 @@ function Login() {
         <InputField
           icon={<Fontisto name="email" size={18} color="#4f5351" />}
           placeholder="Email"
-          value={"Email"}
+          value={email}
           iconName="Email"
+          onChangeText={setEmail}
         />
 
         <InputField
           icon={<EvilIcons name="lock" size={22} color="#4f5351" />}
           placeholder="Password"
           secureTextEntry={true}
-          value={"Password"}
+          value={password}
           iconName="password"
+          onChangeText={setPassword}
         />
       </View>
 
       <View>
-        <Pressable
-          onPress={() => {
-            router.push("./forgot_password");
-          }}
-        >
+        <Pressable onPress={handleLogin}>
           <Text
             style={{
               color: "#166534",
@@ -65,7 +106,7 @@ function Login() {
 
       <View style={{ marginTop: 36 }}>
         <Button
-          title="Sign In"
+          title={loading ? "Signing In ..." : "Sign In"}
           backgroundColor="#166534"
           textColor="#FFFDF9"
           onPress={() => {

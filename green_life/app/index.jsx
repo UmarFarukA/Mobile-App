@@ -8,9 +8,35 @@ import {
   View,
 } from "react-native";
 
+// import React, { useEffect, useState } from "react";
+// import { supabase } from "../utils/supabase";
+
 import Button from "@/components/Button";
 
 export default function Index() {
+  // const [todos, setTodos] = useState([]);
+
+  // useEffect(() => {
+  //   const getTodos = async () => {
+  //     try {
+  //       const { data: todos, error } = await supabase.from("todos").select();
+
+  //       if (error) {
+  //         console.error("Error fetching todos:", error.message);
+  //         return;
+  //       }
+
+  //       if (todos && todos.length > 0) {
+  //         setTodos(todos);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching todos:", error.message);
+  //     }
+  //   };
+
+  //   getTodos();
+  // }, []);
+
   return (
     <View style={styles.container}>
       <View

@@ -1,13 +1,76 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import Item from "@/components/Item";
+import { supabase } from "@/utils/supabase";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+
 export default function Profile() {
+  const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  async function fetchUserProfile() {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error) {
+        Alert.alert("Error", error.message);
+        return;
+      }
+
+      const user = data.user;
+
+      setFullName(user?.user_metadata?.full_name || "User");
+      setEmail(user?.email || "");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoading(true);
+    }
+
+    if (loading) {
+      return <ActivityIndicator />;
+    }
+  }
+
+  const handleLogOut = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        Alert.alert("Loggout Failed", error.message);
+        return;
+      }
+
+      router.replace("/login");
+    } catch (error) {
+      Alert.alert("Error", error.messsage);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <View style={styles.container}>
       <View
@@ -47,12 +110,8 @@ export default function Profile() {
             />
           </View>
           <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              Aliyu Idris
-            </Text>
-            <Text style={{ fontSize: 12, fontWeight: 300 }}>
-              aliyu@example.com
-            </Text>
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>{fullName}</Text>
+            <Text style={{ fontSize: 12, fontWeight: 300 }}>{email}</Text>
             <Pressable>
               <Text
                 style={{ fontSize: 14, fontWeight: "bold", color: "#166534" }}
@@ -103,10 +162,9 @@ export default function Profile() {
         />
       </View>
 
-      <View style={{ paddingHorizontal: 20, marginTop: 18 }}>
-        <Pressable
+      <View style={{ paddingHorizontal: 20, marginTop: 24 }}>
+        <TouchableOpacity
           style={{
-            marginTop: 24,
             justifyContent: "center",
             flexDirection: "row",
             alignItems: "center",
@@ -119,12 +177,13 @@ export default function Profile() {
             borderRadius: 10,
             backgroundColor: "#fde6e6",
           }}
+          onPress={handleLogOut}
         >
           <MaterialIcons name="logout" size={24} color="red" />
           <Text style={{ color: "red", fontSize: 18, fontWeight: 500 }}>
-            Logout
+            {loading ? "Logging out..." : "Logout"}
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );

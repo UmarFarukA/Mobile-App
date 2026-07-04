@@ -4,6 +4,7 @@ import InputField from "@/components/InputField";
 import OutlineButton from "@/components/OutlineButton";
 import { router } from "expo-router";
 import {
+  Alert,
   Platform,
   Pressable,
   StatusBar,
@@ -12,11 +13,71 @@ import {
   View,
 } from "react-native";
 
+import { useState } from "react";
+
+import { supabase } from "@/utils/supabase";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Fontisto from "@expo/vector-icons/Fontisto";
 
-function Register() {
+function Register({ navigation }) {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm_password, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async () => {
+    if (!fullName || !email || !password || !confirm_password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    if (password !== confirm_password) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
+      });
+
+      if (error) {
+        Alert.alert("Sign Up Failed", error.message);
+        return;
+      }
+
+      setFullName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+
+      Alert.alert(
+        "Account Created",
+        "Your account has been created!, Login Please",
+        [
+          {
+            text: "OK",
+            onPress: () => router.replace("/login"),
+          },
+        ],
+      );
+    } catch (error) {
+      Alert.alert("Sign Up Failed", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Header caption="Sign Up" />
@@ -29,36 +90,45 @@ function Register() {
         <InputField
           icon={<FontAwesome5 name="user" size={18} color="#4f5351" />}
           placeholder="Full Name"
-          value={"Full Name"}
+          value={fullName}
           iconName="Full Name"
+          onChangeText={setFullName}
         />
 
         <InputField
           icon={<Fontisto name="email" size={18} color="#4f5351" />}
           placeholder="Email"
-          value={"Email"}
+          value={email}
           iconName="Email"
+          onChangeText={setEmail}
         />
 
         <InputField
           icon={<EvilIcons name="lock" size={22} color="#4f5351" />}
           placeholder="Password"
           secureTextEntry={true}
-          value={"Password"}
+          value={password}
           iconName="password"
+          onChangeText={setPassword}
         />
 
         <InputField
           icon={<EvilIcons name="lock" size={22} color="#4f5351" />}
           placeholder="Confirm Password"
           secureTextEntry={true}
-          value={"Confirm Password"}
+          value={confirm_password}
           iconName="confirm-password"
+          onChangeText={setConfirmPassword}
         />
       </View>
 
       <View>
-        <Button title="Sign Up" backgroundColor="#166534" textColor="#FFFDF9" />
+        <Button
+          title={loading ? "Creating Account" : "Sign Up"}
+          backgroundColor="#166534"
+          textColor="#FFFDF9"
+          onPress={handleRegister}
+        />
       </View>
 
       <View
