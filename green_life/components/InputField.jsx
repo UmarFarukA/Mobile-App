@@ -10,16 +10,17 @@ function InputField({
   placeholder,
   secureTextEntry,
   keyboardType = "default",
+  error = false,
 }) {
   const [visible, setVisible] = useState(false);
   return (
-    <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
+    <View
+      style={[
+        styles.container,
+        error ? { borderWidth: 1, borderColor: "red" } : null,
+      ]}
+    >
+      <View style={styles.inputContainer}>
         <View>{icon}</View>
 
         <View>
@@ -62,6 +63,11 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     borderWidth: 1,
     borderColor: "#ccc",
+  },
+
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 
   input: {

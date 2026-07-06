@@ -22,9 +22,13 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState(false);
 
   async function handleLogin() {
+    console.log(email, password);
+
     if (!email || !password) {
+      setErrors(true);
       Alert.alert("Error", "All fields are required");
       return;
     }
@@ -77,6 +81,7 @@ function Login() {
           value={email}
           iconName="Email"
           onChangeText={setEmail}
+          error={errors}
         />
 
         <InputField
@@ -86,6 +91,7 @@ function Login() {
           value={password}
           iconName="password"
           onChangeText={setPassword}
+          error={errors}
         />
       </View>
 
@@ -109,9 +115,7 @@ function Login() {
           title={loading ? "Signing In ..." : "Sign In"}
           backgroundColor="#166534"
           textColor="#FFFDF9"
-          onPress={() => {
-            router.push("./home");
-          }}
+          onPress={handleLogin}
         />
       </View>
 

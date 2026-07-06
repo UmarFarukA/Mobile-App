@@ -26,10 +26,12 @@ function Register({ navigation }) {
   const [password, setPassword] = useState("");
   const [confirm_password, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState(false);
 
   const handleRegister = async () => {
     if (!fullName || !email || !password || !confirm_password) {
-      Alert.alert("Error", "Please fill in all fields");
+      setErrors(true);
+      // Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
@@ -93,6 +95,7 @@ function Register({ navigation }) {
           value={fullName}
           iconName="Full Name"
           onChangeText={setFullName}
+          error={errors}
         />
 
         <InputField
@@ -101,6 +104,7 @@ function Register({ navigation }) {
           value={email}
           iconName="Email"
           onChangeText={setEmail}
+          error={errors}
         />
 
         <InputField
@@ -110,6 +114,7 @@ function Register({ navigation }) {
           value={password}
           iconName="password"
           onChangeText={setPassword}
+          error={errors}
         />
 
         <InputField
@@ -119,6 +124,7 @@ function Register({ navigation }) {
           value={confirm_password}
           iconName="confirm-password"
           onChangeText={setConfirmPassword}
+          error={errors}
         />
       </View>
 

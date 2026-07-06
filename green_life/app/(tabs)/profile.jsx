@@ -46,7 +46,7 @@ export default function Profile() {
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
 
     if (loading) {
